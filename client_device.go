@@ -1,9 +1,9 @@
 package jpush
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
-	"bytes"
 )
 
 func (c *Client) DeviceView(registrationId string) (map[string]interface{}, error) {
@@ -55,6 +55,18 @@ func (c *Client) DeviceGetWithAlias(alias string, platforms []string) (map[strin
 
 func (c *Client) DeviceDeleteAlias(alias string) ([]byte, error) {
 	link := c.deviceUrl + "/v3/aliases/" + alias
+	resp, err := c.request("DELETE", link, nil, false)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Bytes(), nil
+}
+
+// DELETE /v3/aliases/{alias_value}?platform=android,ios,quickapp,hmos
+// Authorization: Basic (base64 auth string)
+// Accept: application/json
+func (c *Client) DeviceDeleteAliasByPlatform(alias string, platforms []string) ([]byte, error) {
+	link := c.deviceUrl + "/v3/aliases/" + alias + "?platform=" + strings.Join(platforms, ",")
 	resp, err := c.request("DELETE", link, nil, false)
 	if err != nil {
 		return nil, err
